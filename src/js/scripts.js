@@ -129,26 +129,35 @@ document.addEventListener("DOMContentLoaded", () => {
   // === Animate Skill Bars ======
   // =============================
   const skillBars = document.querySelectorAll(".skill-progress");
+
+  const levelToWidth = {
+    Beginner: 40,
+    Intermediate: 70,
+    Advanced: 90,
+  };
+
   const skillObserver = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const bar = entry.target;
-          const percent = parseInt(bar.getAttribute("data-skill"));
-          bar.style.width = percent + "%";
+          const level = bar.getAttribute("data-level");
+          const width = levelToWidth[level] || 0;
 
-          const counter = bar.parentElement.querySelector(".skill-percent");
-          if (counter) {
-            let current = 0;
-            const step = Math.floor(1000 / percent);
-            const interval = setInterval(() => {
-              current++;
-              counter.textContent = `${current}%`;
-              if (current >= percent) clearInterval(interval);
-            }, step);
+          bar.style.width = width + "%";
+
+          const label =
+            bar.parentElement.parentElement.querySelector(".skill-level");
+          if (label) {
+            label.style.opacity = 0;
+            setTimeout(() => {
+              label.textContent = level;
+              label.style.transition = "opacity 0.6s ease-in-out";
+              label.style.opacity = 1;
+            }, 1000);
           }
 
-          observer.unobserve(entry.target);
+          observer.unobserve(bar);
         }
       });
     },
